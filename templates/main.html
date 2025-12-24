@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<p>asdasdads</p>
+<p>progres%</p>
+<div id="progres-container"></div>
+
+<form action="" method="post" >
+    <input type="hidden" name="action" value="ok">
+    {% csrf_token %}
+    <button type="submit">ok</button>
+</form>
+
+<h3>таск id {{ task_id }}</h3>
+
+
+<button onclick="get_status('{{ task_id }}')">отримати статус</button>
+<script>
+    const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+async function get_status(taskid) {
+    const elem = document.getElementById('progres-container');
+   while (true){
+        
+    try {
+        const response = await fetch(`/api-progres/${taskid}/`);
+        const data = await response.json();
+        if (data.state == 'PROGRESS'){
+            elem.innerText = data.info.progress;
+        } else {
+            console.log(data.state)
+            elem.innerText = data.state;
+            if (data.state == 'SUCCESS'){
+                break
+            }
+        }
+    } catch (error) {
+        console.error("Error fetching status:", error);
+        alert("Failed to fetch status.");
+    }
+
+    await sleep(5000);
+}
+}
+</script>
+{% endblock content %}
