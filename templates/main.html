@@ -2,8 +2,9 @@
 {% block content %}
 <p>asdasdads</p>
 <p>progres%</p>
+<h1>
 <div id="progres-container"></div>
-
+</h1>
 <form action="" method="post" >
     <input type="hidden" name="action" value="ok">
     {% csrf_token %}
@@ -11,6 +12,12 @@
 </form>
 
 <h3>таск id {{ task_id }}</h3>
+
+<form action="" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="run">
+    <button type="submit">run</button>
+</form>
 
 
 <button onclick="get_status('{{ task_id }}')">отримати статус</button>

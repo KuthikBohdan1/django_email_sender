@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import CreateView, ListView, UpdateView,TemplateView
 from django.urls import reverse, reverse_lazy
-from main.tasks import proces
+from main.tasks import proces, job
 from django.shortcuts import redirect
 from django.http import JsonResponse
 from celery.result import AsyncResult
@@ -26,12 +26,12 @@ def on_raw_message(body):
 class ActionTemplateView(TemplateView):
     template_name = "main.html"
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         task_id = self.request.session.get('task_id')
-        print('task id ' + task_id)
-        context["task_id"] = task_id
+        if task_id:
+            print('task id ', task_id)
+            context["task_id"] = task_id
         return context
 
     def post(self, request, *args, **kwargs):
@@ -41,6 +41,10 @@ class ActionTemplateView(TemplateView):
             task = proces.apply_async()
             print(task.id)
             request.session['task_id'] = task.id
+            return redirect("main:a")
+        if action == "run":
+            print("run")
+            result = job.apply_async()
             return redirect("main:a")
         else:
             return self.get(request, *args, **kwargs)
