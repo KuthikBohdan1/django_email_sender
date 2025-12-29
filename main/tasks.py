@@ -1,4 +1,4 @@
-from celery import shared_task, group
+from celery import shared_task, group, chain, chord, chunks
 from email_sender.celery import app
 import time
 from django.http import JsonResponse
@@ -45,7 +45,9 @@ def my_sum(a, b):
 def my_mul(a, b):
     return a * b
 
-
+@app.task
+def summarize(results):
+    return sum(results)
 
 job = group(
     my_sum.s(2, 2),
@@ -54,4 +56,18 @@ job = group(
 )
 
 
+job_chain = chain(
+    my_sum.s(2, 3),
+    my_mul.s(10)
+)
 
+job_chord = chord(
+    job,
+    summarize.s()
+)
+
+
+add.starmap([
+    (1, 2),
+    (3, 4),
+])
